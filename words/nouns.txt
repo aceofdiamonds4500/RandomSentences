@@ -1,0 +1,10 @@
+dog
+cat
+man
+woman
+dude
+chick
+dragon
+alien
+giraffe
+redditor
