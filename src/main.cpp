@@ -31,7 +31,7 @@ int main() {
 
 
     Subject subject = {articles[0],nouns[8]};
-    Verb verb = {adverbs[6], verbs[4]};
+    VerbPhrase verb = {adverbs[6], verbs[4]};
 
     Sentence s = {subject, verb};
 
@@ -41,7 +41,7 @@ int main() {
 
     if (s.verb.adverb)
         std::cout << *s.verb.adverb << " ";
-    std::cout << s.verb.verb;
+    std::cout << s.verb.verb.verb;
 
     std::cout << "\n";
 
