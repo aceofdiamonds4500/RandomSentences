@@ -1,0 +1,10 @@
+alien
+elephant
+orca
+oval
+egg
+animatronic
+idiot
+eyeball
+item
+index

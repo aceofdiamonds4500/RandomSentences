@@ -2,48 +2,56 @@
 #include <string>
 #include <optional>
 
+struct Noun {
+    std::optional<std::string> vowelnoun;
+    std::optional<std::string> consonantnoun;
+};
+
 /*
  * args: [article] and [noun]
  */
 struct Subject {
     std::optional<std::string> article;
-    std::string noun;
+    Noun noun;
 };
 
 /*
- * arg: [verb]
- */
-struct Verb {
-    std::string verb;
-};
-
-/*
- * args: [adverb] and Verb OR Verb
+ * args: [adverb] and [verb] OR [verb]1
  */
 struct VerbPhrase {
     std::optional<std::string> adverb;
-    Verb verb;
+    std::string verb;
 };
 
 /*
  * args: Subject and VerbPhrase
  */
-struct Sentence {
+struct SimpleSentence {
     Subject subject;
     VerbPhrase verb;
 };
 
 struct DepClause{
     std::string subord_conjunction;
-    Sentence sentence;
+    SimpleSentence simp_sentence; //lol
 };
 
 struct IndepClause {
-    Sentence sentence;
+    SimpleSentence simp_sentence;
 };
 
-struct ComplexSentence {
+struct ComplexSentenceDI {
     DepClause depClause;
     char comma = ',';
     IndepClause inClause;
+};
+
+//this only works because subordinating conjunctions are the goat
+struct ComplexSentenceID {
+    IndepClause inClause;
+    DepClause depClause;
+};
+
+struct Sentence {
+
 };

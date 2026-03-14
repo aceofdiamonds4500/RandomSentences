@@ -5,3 +5,4 @@ happily
 dangerously
 annoyingly
 regrettably
+stupidly
