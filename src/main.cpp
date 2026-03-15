@@ -109,7 +109,8 @@ Subject createSubject() {
         noun = createNoun(2);
     }
     else if (article == "the") {
-        noun = createNoun(3);
+        int rand = randomNumber(1,2);
+        noun = createNoun(rand);
     }
     else {
         noun = createNoun(4);
