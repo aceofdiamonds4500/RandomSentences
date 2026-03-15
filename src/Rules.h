@@ -16,7 +16,7 @@ struct Subject {
 };
 
 /*
- * args: [adverb] and [verb] OR [verb]1
+ * args: [adverb] and [verb] OR [verb]
  */
 struct VerbPhrase {
     std::optional<std::string> adverb;
@@ -31,18 +31,26 @@ struct SimpleSentence {
     VerbPhrase verb;
 };
 
+/*
+ * args: SubordinatingConjunction and SimpleSentence
+ */
 struct DepClause{
     std::string subord_conjunction;
     SimpleSentence simp_sentence; //lol
 };
 
+/*
+ * args: depClause [connector] and SimpleSentence (independent clause)
+ */
 struct ComplexSentenceDI {
     DepClause depClause;
     std::string connector;
     SimpleSentence inClause;
 };
 
-//this only works because subordinating conjunctions are the GOAT
+/*
+ * args: SimpleSentence (independent clause) and DependentClause
+ */
 struct ComplexSentenceID {
     SimpleSentence inClause;
     DepClause depClause;
