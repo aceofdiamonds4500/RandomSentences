@@ -17,7 +17,7 @@ SimpleSentence -> Subject Verb
 
 Subject -> [article] [noun] | [noun] 
 
-Verb -> [adverb] Verb | [verb]
+Verb -> [adverb] [verb] | [verb]
 ```
 
 Note: for Subject, we can include Subject [and] Subject could be implemented, as well as an Object non-terminal, but we ran out of time

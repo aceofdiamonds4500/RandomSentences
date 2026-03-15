@@ -1,10 +1,15 @@
-will run
 ran
 runs
-will jump
 jumps
 jumped
-will arrive
 arrives
 arrived
 impeaches
+improves
+improved
+explains
+writes
+wrote
+deleted
+deletes
+obeys

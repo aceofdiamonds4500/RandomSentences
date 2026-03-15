@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <cctype>
 #include "Rules.h"
 
 std::vector<std::string> parse_words(const std::string& filename);
@@ -14,6 +15,9 @@ int articlesSize = static_cast<int>(articles.size());
 std::vector<std::string> adverbs = parse_words("../words/adverbs.txt");
 int adverbsSize = static_cast<int>(adverbs.size());
 
+std::vector<std::string> prop_nouns = parse_words("../words/proper_nouns.txt");
+int propnounsSize = static_cast<int>(prop_nouns.size());
+
 std::vector<std::string> v_nouns = parse_words("../words/vowel_nouns.txt");
 int vnounsSize = static_cast<int>(v_nouns.size());
 
@@ -22,6 +26,10 @@ int cnounsSize = static_cast<int>(c_nouns.size());
 
 std::vector<std::string> verbs = parse_words("../words/verbs.txt");
 int verbsSize = static_cast<int>(verbs.size());
+
+std::vector<std::string> subords = parse_words("../words/subord_conjunctions.txt");
+int subordsSize = static_cast<int>(subords.size());
+
 
 int randomNumber(const int min, const int max) {
     std::random_device rd;
@@ -52,42 +60,99 @@ std::vector<std::string> parse_words(const std::string& filename) {
     return words;
 }
 
-Noun createNoun(int choice) {
-    Noun noun;
-    if (choice == 1 || choice == 3) {
-        noun = {c_nouns[randomNumber(0, cnounsSize-1)],std::nullopt};
-    }
-    else if (choice == 2) {
-        noun = {std::nullopt, v_nouns[randomNumber(0, vnounsSize-1)]};
+VerbPhrase createVerbPhrase() {
+    std::optional<std::string> adverb;
+
+    int adverbExistance = randomNumber(1,10);
+    if (adverbExistance > 2) {
+        adverb = std::nullopt;
     }
     else {
-        std::cerr << "Invalid choice: " << choice << std::endl;
+        adverb = adverbs.at(randomNumber(0, adverbsSize-1));
+    }
+
+    VerbPhrase verb_phrase = {adverb, verbs.at(randomNumber(0, verbsSize-1))};
+    return verb_phrase;
+}
+
+Noun createNoun(int vc_choice) {
+    Noun noun;
+    if (vc_choice == 1 || vc_choice == 3) {
+        noun = {c_nouns.at(randomNumber(0, cnounsSize-1)),std::nullopt};
+    }
+    else if (vc_choice == 2) {
+        noun = {std::nullopt, v_nouns.at(randomNumber(0, vnounsSize-1))};
+    }
+    else {
+        noun = {prop_nouns.at(randomNumber(0, propnounsSize-1)), std::nullopt};
     }
     return noun;
 }
 
 Subject createSubject() {
-    std::string articlePick = articles[randomNumber(0, articlesSize-1)];
+    std::optional<std::string> article;
+
+    int articleExistance = randomNumber(1,10);
+    if (articleExistance > 6) {
+        article = std::nullopt;
+    }
+    else {
+        article = articles.at(randomNumber(0, articlesSize-1));
+    }
 
     Noun noun;
 
-    if (articlePick == "a") {
+    if (article == "a") {
         noun = createNoun(1);
     }
-    else if (articlePick == "an") {
+    else if (article == "an") {
         noun = createNoun(2);
     }
-    else if (articlePick == "the") {
+    else if (article == "the") {
         noun = createNoun(3);
     }
+    else {
+        noun = createNoun(4);
+    }
 
-    Subject subject = {articlePick, noun};
+
+    Subject subject = {article, noun};
 
     return subject;
 }
 
+SimpleSentence createSimpleSentence() {
+    SimpleSentence sentence = {createSubject(), createVerbPhrase()};
+    return sentence;
+}
+
+DepClause createDepClause() {
+    std::string subord_conj = subords.at(randomNumber(0, subordsSize-1));
+
+    SimpleSentence sentence = createSimpleSentence();
+
+    DepClause clause = {subord_conj, createSimpleSentence()};
+    return clause;
+}
+
+ComplexSentenceDI createComplexSentenceDI() {
+    DepClause depClause = createDepClause();
+    SimpleSentence indepClause = createSimpleSentence();
+    ComplexSentenceDI depind = {depClause,",",indepClause};
+
+    return depind;
+}
+
+ComplexSentenceID createComplexSentenceID() {
+    DepClause depClause = createDepClause();
+    SimpleSentence indepClause = createSimpleSentence();
+    ComplexSentenceID inddep = {indepClause,depClause};
+
+    return inddep;
+}
+
 std::string subject_ToString(const Subject& subject) {
-    std::string full_subject = "";
+    std::string full_subject;
     if (subject.article) full_subject += subject.article.value() + " ";
 
     if (subject.noun.consonantnoun) full_subject += subject.noun.consonantnoun.value();
@@ -97,44 +162,93 @@ std::string subject_ToString(const Subject& subject) {
     return full_subject;
 }
 
-void simpsentence_ToString(const Sentence& sentence) {
-    const Subject subject = createSubject();
-    std::cout << subject_ToString(subject) << std::endl;
+std::string verbPhrase_ToString(const VerbPhrase& verb_phrase) {
+    std::string full_verb_phrase;
 
+    if (verb_phrase.adverb) full_verb_phrase += verb_phrase.adverb.value() + " ";
+
+    full_verb_phrase += verb_phrase.verb;
+
+    return full_verb_phrase;
+}
+
+std::string simpSentence_ToString(const SimpleSentence& simp_sentence) {
+    std::string full_simpsentence = subject_ToString(simp_sentence.subject) + " " + verbPhrase_ToString(simp_sentence.verb);
+    return full_simpsentence;
+}
+
+std::string depClause_ToString(const DepClause& depClause) {
+    std::string full_depC = depClause.subord_conjunction + " " + simpSentence_ToString(depClause.simp_sentence);
+    return full_depC;
+}
+
+std::string compSentenceDI_ToString(const ComplexSentenceDI& depind) {
+    std::string full_complexSentence = depClause_ToString(depind.depClause) + depind.connector + " " + simpSentence_ToString(depind.inClause);
+    return full_complexSentence;
+}
+
+std::string compSentenceID_ToString(const ComplexSentenceID& inddep) {
+    std::string full_complexSentence = simpSentence_ToString(inddep.inClause) + " " + depClause_ToString(inddep.depClause);
+    return full_complexSentence;
+}
+
+std::string capitalize(const std::string& s) {
+    std::string capitalized_str;
+
+    if (s[0] >= 97 && s[0] <= 122) {
+        capitalized_str += static_cast<char>(std::toupper(s[0]));
+        capitalized_str += s.substr(1);
+    }
+    else {
+        return s;
+    }
+    return capitalized_str;
+}
+
+std::string generateSentence() {
+    std::string sentence;
+
+    int rand = randomNumber(1,100);
+    if (rand < 33) {
+        SimpleSentence simp_sentence = createSimpleSentence();
+        sentence = simpSentence_ToString(simp_sentence);
+    }
+    else if (rand > 66) {
+        ComplexSentenceDI complexDI = createComplexSentenceDI();
+        sentence = compSentenceDI_ToString(complexDI);
+    }
+    else {
+        ComplexSentenceID complexID = createComplexSentenceID();
+        sentence = compSentenceID_ToString(complexID);
+    }
+    return sentence;
 }
 
 int main() {
     int input = 1;
-    printf("Run a random sentence?\n> ");
+
+    printf("Generate a random sentence? (1 to generate, 0 for quit)\n> ");
 
     do {
         std::cin >> input;
 
+        if (std::cin.fail()) {
+            std::cout << "Try again. (1 to generate, 0 for quit)" << std::endl;
+            return 1;
+        }
+
         if (input == 1) {
-            //add sentence constructor here
-            Sentence sentence;
-            simpsentence_ToString(sentence);
+            std::cout << "\"" << capitalize(generateSentence()) << ".\"" << std::endl;
+        }
+        else if (input == 0) {
+            std::cout << "Goodbye." << std::endl;
+            return 0;
+        }
+        else {
+            std::cout << "Try again. (1 to generate, 0 for quit)";
         }
     } while (input != 0);
 
 
     return 0;
 }
-
-/*
- * test code for if somethings not working
-    Subject subject = {std::nullopt,nouns[8]};
-    VerbPhrase verb = {adverbs[6], verbs[4]};
-
-    Sentence s = {subject, verb};
-
-    if (s.subject.article)
-        std::cout << *s.subject.article << " ";
-    std::cout << s.subject.noun << " ";
-
-    if (s.verb.adverb)
-        std::cout << *s.verb.adverb << " ";
-    std::cout << s.verb.verb.verb;
-
-    std::cout << "\n";
- */

@@ -36,22 +36,14 @@ struct DepClause{
     SimpleSentence simp_sentence; //lol
 };
 
-struct IndepClause {
-    SimpleSentence simp_sentence;
-};
-
 struct ComplexSentenceDI {
     DepClause depClause;
-    char comma = ',';
-    IndepClause inClause;
+    std::string connector;
+    SimpleSentence inClause;
 };
 
-//this only works because subordinating conjunctions are the goat
+//this only works because subordinating conjunctions are the GOAT
 struct ComplexSentenceID {
-    IndepClause inClause;
+    SimpleSentence inClause;
     DepClause depClause;
-};
-
-struct Sentence {
-
 };
